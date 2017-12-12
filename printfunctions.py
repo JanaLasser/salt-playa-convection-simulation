@@ -2,6 +2,9 @@ import matplotlib.pyplot as plt
 import numpy as np
 from os.path import join
 
+def PrintParams():
+	pass
+
 def PrintColorMatrix(Matrix, length, par, vmin = 0., vmax = 0., savepath = '' , savename = 'test', time = 0.):
 #	with PdfPages(SAVEPATH+savename +'.pdf') as pdf:
 	fig, ax = plt.subplots()
@@ -28,10 +31,22 @@ def PrintCrossSection(Row, vmin = 0., vmax = 0., \
 	plt.savefig(savepath+savename + str(round(time, 2)) + '.png')
 	plt.close()
 
-def PrintConcentrationValues(Matrix, par, savepath, savename, fmt='%.18e'):
-	savename2 = savename + 'npy'
-	np.savetxt(join(savepath,savename), Matrix, delimiter=',', fmt = fmt)
-	np.save(join(savepath,savename2), Matrix)
+def PlotField(field, time, field_name, savepath):
+	savename = '{}_{:1.3f}'.format(field_name, time)
+	fig, ax = plt.subplots()
+	im = ax.imshow(np.transpose(field), cmap=plt.get_cmap('hot'), \
+		interpolation='nearest', aspect = 'auto')
+	fig.colorbar(im)
+	plt.title('field: {} time: {:1.3f}'.format(field_name, time))
+	plt.xlabel('depth [natural units]')
+	plt.ylabel('width [natural units]')
+	plt.savefig(join(savepath,savename) + '.png')
+	plt.close()
+
+
+def PrintField(field, time, field_name, savepath, fmt='%.18e'):
+	savename = '{}_{:1.3f}'.format(field_name, time)
+	np.savetxt(join(savepath,savename), field, delimiter=',', fmt=fmt)
 
 def CountNumberOfMaxima(Matrix):
 	size = np.shape(Matrix)

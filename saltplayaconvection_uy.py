@@ -1,6 +1,8 @@
 ## Limit number of OMP threads used by numpy/scipy via OpenBLAS
 import os
 os.environ['OMP_NUM_THREADS'] = '{:d}'.format(1)
+from os.path import join
+from os import getcwd
 
 import numpy as np
 #from scipy.fftpack import fftn, ifftn, dst, idst, fft, ifft
@@ -14,32 +16,87 @@ from derivative import CreateCFDMatrix#, CreateFFTMatrix
 from np_derivatives import CreateNP_CFDMatrix, Create_FFTMatrix
 from printfunctions import *
 from initialconditions import *
-#from matplotlib.backends.backend_pdf import PdfPages
 import sys
+import argparse
 ###################
 
-# Constants for time stepping (natural units)
-MAXTIME = 25.
-SAVETIME = 0.1
+# parameter-I/O
+parser = argparse.ArgumentParser(description='Simulation of two-dimensional '\
+    + 'porous media flow' +\
+    ' \nCopyright (C) 2017 Marcel Ernst & Jana Lasser')
+
+parser.add_argument('-dest', type=str, help='Complete path to the folder '\
+                + 'results will be saved to if different than script location',
+                default=getcwd())
+
+parser.add_argument('-Ra','--rayleigh', type=int, help='Rayleigh number of'+\
+				' the system', default=100)
+
+parser.add_argument('-H','--height', type=int, help='Height of the '\
+                + 'system in natural units',\
+                default=10)
+
+parser.add_argument('-A','--aspect_ratio', type=float, \
+                help='ratio of system width to height in natural units ',\
+                default = 1.0)
+
+parser.add_argument('-res','--resolution',type=int,\
+                    help='number of grid cells per unit of length.',\
+                    default=6)
+
+parser.add_argument('-T','--maximum_simulation_time',type=float, \
+					help='duration of simulation in natural units',\
+					default=25.0)
+
+parser.add_argument('-savetime','--saving_time_interval',type=float,\
+                    help='Interval in which simulation output is dumped',\
+                    default=0.1)
+
+parser.add_argument('-clf', '--adaptive_time_constant', type=float,\
+					help='CLF-constant for adaptive timestepping',\
+					default = 0.05)
+
+parser.add_argument('-plt','--plot_field',action="store_true",\
+                help='Plots fields for debugging / movie creation',default=False)
+
+
+args = parser.parse_args()
+
+# System control parameter
+RA = args.rayleigh # Rayleigh number
+
+# Space constants
+HEIGHT = args.height # height in natural units
+A = args.aspect_ratio # aspect ratio of length to HEIGHT
+res = args.resolution # number of grid cells / unit of length
+LENGTH = HEIGHT*A
+
+# Time constants
+MAXTIME = args.maximum_simulation_time # maximum simulation time in natural units
+SAVETIME = args.saving_time_interval                                                    
+adaptive_dt_constant = args.adaptive_time_constant
 SAVECOUNTER = 0
 dt = 0.0001
-# CFL constant
-adaptive_dt_constant = 0.05 # if it is not stable, reduce this number
 global_time = 0.0
 
+# I/O handling
+dest = args.dest # location of results folder
+run = 1
+folder_name = 'Ra{}_{}x{}_res{}_T{}_clf{}_run{}'.format(RA, HEIGHT, \
+	int(LENGTH), res, MAXTIME, adaptive_dt_constant,run)
+SAVEPATH = join(dest, folder_name)
+plot_field = args.plot_field
 
 #system parameters: Rayleigh = Ra, lower layer Rayleigh  = Ra + Ra2
 # A = aspect ratio = L/H
 # amplitude = amplitude of sinusoidal evaporation rate E(X)
 # waves = number of waves of E(X) in the box
 # phi = initial phase shift of these waves and the convection cell
-parameters = {'Ra': int(sys.argv[2]), 'Ra2' : 0., 'A': 1.0	 , \
+parameters = {'Ra': RA, 'Ra2' : 0., 'A': A	 , \
 	'amplitude': 0., 'waves': 1., 'phi': 0.0}
 
-# size of box (natural units)
-HEIGHT = 40 #height in natural units
+# size of box (natural units) 
 length = np.array([HEIGHT*parameters['A'],HEIGHT]) #2d
-res = 8
 
 # number of grid points
 SIZE_Y =  HEIGHT *  res
@@ -53,9 +110,13 @@ dx = np.divide(length, np.array([size[0], size[1]-1])) #2d
 Ra = Rayleigh_Matrix(size, length, parameters)
 
 # create savepath
-SAVEPATH = sys.argv[1] + '/'
-if not os.path.exists(SAVEPATH):
-    os.makedirs(SAVEPATH)
+while os.path.exists(SAVEPATH):
+	print(SAVEPATH)
+	run += 1
+	folder_name = 'Ra{}_{}x{}_res{}_T{}_clf{}_run{}'.format(RA, HEIGHT, \
+	int(LENGTH), res, MAXTIME, adaptive_dt_constant,run)
+	SAVEPATH = join(dest, folder_name)
+os.makedirs(SAVEPATH)
 
 #values of boundaries for concentration (C from 0 to 1)
 boundaries_C = [1., 0.] #!!!!!
@@ -182,22 +243,27 @@ while global_time < MAXTIME:
 	# print stuff every SAVETIME
 	if global_time > SAVECOUNTER*SAVETIME:
 		print(round(global_time,2), dt, MAXTIME)
-		PrintColorMatrix(Matrix = C, length = length, par = parameters, vmin = -0., vmax = 1.,\
-			savepath = SAVEPATH, savename = ('C_' + str(float(length[0]))+'_'), time = global_time)
+		#PrintColorMatrix(Matrix = C, length = length, par = parameters, vmin = -0., vmax = 1.,\
+		#	savepath = SAVEPATH, savename = ('C_' + str(float(length[0]))+'_'), time = global_time)
 		#PrintCrossSection(Row = C[:,int(size[1]/2)].real, savepath = SAVEPATH, \
 		#savename = ('C'+str(float(length[0]))+'_'),\
 		#time = global_time, xlabel = 'x-direction', ylabel = 'concentration')
 
-		savename='C_{}x{}_yres{:d}_Ra{:d}_dt{:1.4f}_T{}'.\
-				format(HEIGHT, length, SIZE_Y, parameters['Ra'], dt, global_time)
-		PrintConcentrationValues(C, parameters, savepath=SAVEPATH,\
-			savename=savename)
+		#savename='C_{}x{}_yres{:d}_Ra{:d}_dt{:1.4f}_T{}'.\
+		#		format(HEIGHT, length, SIZE_Y, parameters['Ra'], dt, global_time)
+		PrintField(C, global_time, 'C', savepath=SAVEPATH)
+		PrintField(U[1,0:,0:], global_time, 'Uz', savepath=SAVEPATH)
+		PrintField(U[0,0:,0:], global_time, 'Ux', savepath=SAVEPATH)
+		if plot_field:
+			PlotField(C, global_time, 'C', savepath=SAVEPATH)
+			PlotField(U[1,0:,0:], global_time, 'Uz', savepath=SAVEPATH)
+			PlotField(U[0,0:,0:], global_time, 'Ux', savepath=SAVEPATH)
 
 		# Count number of maxima for each height and SAVETIME and save matrix
 
-		NumberOfMaxima[SAVECOUNTER, :] = CountNumberOfMaxima(C)
-		savename='NumberOfMaxima_{}x{}_yres{:d}_Ra{:d}'.\
-				format(HEIGHT, length, SIZE_Y, parameters['Ra'])
-		PrintConcentrationValues(NumberOfMaxima, parameters, savepath=SAVEPATH,\
-			savename=savename, fmt = '%i')
+		#NumberOfMaxima[SAVECOUNTER, :] = CountNumberOfMaxima(C)
+		#savename='NumberOfMaxima_{}x{}_yres{:d}_Ra{:d}'.\
+		#		format(HEIGHT, length, SIZE_Y, parameters['Ra'])
+		#PrintConcentrationValues(NumberOfMaxima, parameters, savepath=SAVEPATH,\
+		#	savename=savename, fmt = '%i')
 		SAVECOUNTER += 1
