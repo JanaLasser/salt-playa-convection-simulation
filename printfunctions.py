@@ -1,0 +1,44 @@
+import matplotlib.pyplot as plt
+import numpy as np
+from os.path import join
+
+def PrintColorMatrix(Matrix, length, par, vmin = 0., vmax = 0., savepath = '' , savename = 'test', time = 0.):
+#	with PdfPages(SAVEPATH+savename +'.pdf') as pdf:
+	fig, ax = plt.subplots()
+	if vmin != vmax:
+		im = ax.imshow(np.transpose(Matrix), cmap=plt.get_cmap('hot'), interpolation='nearest',
+   	           vmin=vmin, vmax=vmax, extent=[0.,length[0],length[1],0], aspect = 'equal')
+	else:
+		im = ax.imshow(np.transpose(Matrix), cmap=plt.get_cmap('hot'), interpolation='nearest', extent=[0.,length[0],length[1],0], aspect = 'auto')
+	fig.colorbar(im)
+	plt.title('Rayleigh = %.1f, time = %.2f' % (par['Ra'], time))
+	plt.xlabel('x-value')
+	plt.ylabel('y-value')
+#	pdf.savefig()
+	plt.savefig(savepath+savename + str(round(time, 2)) + '.png')
+	plt.close()
+
+def PrintCrossSection(Row, vmin = 0., vmax = 0., \
+	savepath = '',  savename = 'test', time = 0., xlabel = 'x', ylabel = 'y'):
+	if vmin != vmax:
+		plt.axis([0, np.shape(Row)[0]-1, vmin, vmax])
+	plt.xlabel(xlabel)
+	plt.ylabel(ylabel)
+	plt.plot(Row)
+	plt.savefig(savepath+savename + str(round(time, 2)) + '.png')
+	plt.close()
+
+def PrintConcentrationValues(Matrix, par, savepath, savename, fmt='%.18e'):
+	savename2 = savename + 'npy'
+	np.savetxt(join(savepath,savename), Matrix, delimiter=',', fmt = fmt)
+	np.save(join(savepath,savename2), Matrix)
+
+def CountNumberOfMaxima(Matrix):
+	size = np.shape(Matrix)
+	number_of_maxima = np.zeros(size[1], dtype=np.int)
+	for y in range(size[1]):
+		for x in range(size[0]):
+			if Matrix[x,y] - 1e-6 > np.max((Matrix[(x-1)%size[0],y],Matrix[(x+1)%size[0],y])):
+				number_of_maxima[y] += 1
+	return number_of_maxima
+	
