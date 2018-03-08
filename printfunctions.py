@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 from os.path import join
+import cPickle as pickle
 
 def PrintParams():
 	pass
@@ -44,9 +45,9 @@ def PlotField(field, time, field_name, savepath):
 	plt.close()
 
 
-def PrintField(field, time, field_name, savepath, fmt='%.18e'):
+def PrintField(field, time, field_name, savepath):
 	savename = '{}_{:1.3f}'.format(field_name, time)
-	np.savetxt(join(savepath,savename), field, delimiter=',', fmt=fmt)
+	np.save(join(savepath,savename), field)
 
 def CountNumberOfMaxima(Matrix):
 	size = np.shape(Matrix)
@@ -56,4 +57,25 @@ def CountNumberOfMaxima(Matrix):
 			if Matrix[x,y] - 1e-6 > np.max((Matrix[(x-1)%size[0],y],Matrix[(x+1)%size[0],y])):
 				number_of_maxima[y] += 1
 	return number_of_maxima
+
+# parameters dict example: {'Ra': RA, 'Ra2' : 0., 'A': A, \
+#	'amplitude': amplitude, 'waves': waves, 'phi': 0.0, \
+#	'max_T':MAXTIME, 'clf':adaptive_dt_constant, 'res':res,\
+#	'HEIGHT':HEIGHT, 'LENGHT':LENGHT}
+def PrintParams(params, savepath, run_name):
+	# use `pickle.loads` to do the reverse
+	with open(join(savepath,run_name + '_params.txt')) as param_file:
+    	param_file.write('Ra {}'.format(params['Ra']))
+    	param_file.write('Ra2 {}'.format(params['Ra2']))
+    	param_file.write('amplitude {}'.format(params['amplitude']))
+    	param_file.write('waves {}'.format(params['waves']))
+    	param_file.write('phi {}'.format(params['phi']))
+    	param_file.write('max_T {}'.format(params['max_T']))
+    	param_file.write('clf {}'.format(params['clf']))
+    	param_file.write('res {}'.format(params['res']))
+    	param_file.write('HEIGHT {}'.format(params['HEIGHT']))
+    	param_file.write('LENGTH {}'.format(params['LENGHT']))
+    	param_file.write('seed {}'.format(params['seed']))
+
+
 	

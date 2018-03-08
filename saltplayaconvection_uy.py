@@ -18,6 +18,7 @@ from printfunctions import *
 from initialconditions import *
 import sys
 import argparse
+from datetime import datetime
 ###################
 
 # parameter-I/O
@@ -59,6 +60,14 @@ parser.add_argument('-clf', '--adaptive_time_constant', type=float,\
 parser.add_argument('-plt','--plot_field',action="store_true",\
                 help='Plots fields for debugging / movie creation',default=False)
 
+parser.add_argument('-amplitude','--wave_amplitude',type=float, \
+                help='Amplitude of sinusoidal variations in evaporation' + \
+                ' rate at the surface boundary condition',default=0)
+
+parser.add_argument('-waves','--wave_number',type=int,\
+                help='Number of sinusoidal variations in evaporation' + \
+                ' rate at the surface boundary condition',default=1)
+
 
 args = parser.parse_args()
 
@@ -76,24 +85,28 @@ MAXTIME = args.maximum_simulation_time # maximum simulation time in natural unit
 SAVETIME = args.saving_time_interval                                                    
 adaptive_dt_constant = args.adaptive_time_constant
 SAVECOUNTER = 0
-dt = 0.0001
-global_time = 0.0
-
-# I/O handling
-dest = args.dest # location of results folder
-run = 1
-folder_name = 'Ra{}_{}x{}_res{}_T{}_clf{}_run{}'.format(RA, HEIGHT, \
-	int(LENGTH), res, MAXTIME, adaptive_dt_constant,run)
-SAVEPATH = join(dest, folder_name)
-plot_field = args.plot_field
+dt = 0.0001 # initial value for dt, will be adapted later
+global_time = 0.0 # initial value for global time
 
 #system parameters: Rayleigh = Ra, lower layer Rayleigh  = Ra + Ra2
 # A = aspect ratio = L/H
 # amplitude = amplitude of sinusoidal evaporation rate E(X)
 # waves = number of waves of E(X) in the box
 # phi = initial phase shift of these waves and the convection cell
+amplitude = args.wave_amplitude
+waves = args.wave_number
 parameters = {'Ra': RA, 'Ra2' : 0., 'A': A	 , \
-	'amplitude': 0., 'waves': 1., 'phi': 0.0}
+	'amplitude': amplitude, 'waves': waves, 'phi': 0.0, \
+	'max_T':MAXTIME, 'clf':adaptive_dt_constant, 'res':res,\
+	'HEIGHT':HEIGHT, 'LENGHT':LENGHT}
+
+# I/O handling
+dest = args.dest # location of results folder
+run = 1
+run_name = 'Ra{}_{}x{}_res{}_T{}_clf{}_amp{}_waves{}_run{}'.format(RA, HEIGHT, \
+	int(LENGTH), res, MAXTIME, adaptive_dt_constant,amplitude, waves, run)
+SAVEPATH = join(dest, run_name)
+plot_field = args.plot_field
 
 # size of box (natural units) 
 length = np.array([HEIGHT*parameters['A'],HEIGHT]) #2d
@@ -109,14 +122,21 @@ dx = np.divide(length, np.array([size[0], size[1]-1])) #2d
 # Create Rayleigh matrix for height dependent Rayleigh number
 Ra = Rayleigh_Matrix(size, length, parameters)
 
-# create savepath
+# create savepath which will serve as root directory for
+# the simulation results. Results for the three fields will
+# be saved to three subfolders 'C', 'Ux' and 'Uz'
 while os.path.exists(SAVEPATH):
 	print(SAVEPATH)
 	run += 1
-	folder_name = 'Ra{}_{}x{}_res{}_T{}_clf{}_run{}'.format(RA, HEIGHT, \
-	int(LENGTH), res, MAXTIME, adaptive_dt_constant,run)
-	SAVEPATH = join(dest, folder_name)
+	run_name = 'Ra{}_{}x{}_res{}_T{}_clf{}_amp{}_waves{}_run{}'.format(RA, HEIGHT, \
+	int(LENGTH), res, MAXTIME, adaptive_dt_constant,amplitude, waves, run)
+	SAVEPATH = join(dest, run_name)
+
+# create directories for data storage
+fields = ['C','Ux'.'Uz']
 os.makedirs(SAVEPATH)
+for field in fields:
+	os.makedirs(join(SAVEPATH,field))
 
 #values of boundaries for concentration (C from 0 to 1)
 boundaries_C = [1., 0.] #!!!!!
@@ -225,9 +245,16 @@ def IntegrationStep(U, C, Psi, Psik, Omega, par, dx, global_time, dt):
 
 
 # Define initial conditions
+seed = datetime.now()
+np.random.seed(seed)
+parameters.update({'seed':seed})
 (U, C, Psi, Omega, Psik) = InitialConditions(size, parameters, dx)
 U0, Omega0 = SinusoidalEvaporation(size_b, length, parameters)
-NumberOfMaxima = np.zeros((int(MAXTIME/SAVETIME)+1,size[1]), dtype = np.int)
+#NumberOfMaxima = np.zeros((int(MAXTIME/SAVETIME)+1,size[1]), dtype = np.int)
+
+# print a file recording simulation parameters and random seed
+# into the simulation result root directory
+PrintParams(parameters, seed, SAVEPATH, run_name)
 
 adaptive_time_counter = 0
 while global_time < MAXTIME:
@@ -240,7 +267,9 @@ while global_time < MAXTIME:
 		#print(dt, adaptive_time_counter)
 	adaptive_time_counter += 1
 	
-	# print stuff every SAVETIME
+	# save system state every SAVETIME:
+	# all three fields C, Ux, Uz will be saved in binary format 
+	# and plotted
 	if global_time > SAVECOUNTER*SAVETIME:
 		print(round(global_time,2), dt, MAXTIME)
 		#PrintColorMatrix(Matrix = C, length = length, par = parameters, vmin = -0., vmax = 1.,\
@@ -251,19 +280,12 @@ while global_time < MAXTIME:
 
 		#savename='C_{}x{}_yres{:d}_Ra{:d}_dt{:1.4f}_T{}'.\
 		#		format(HEIGHT, length, SIZE_Y, parameters['Ra'], dt, global_time)
-		PrintField(C, global_time, 'C', savepath=SAVEPATH)
-		PrintField(U[1,0:,0:], global_time, 'Uz', savepath=SAVEPATH)
-		PrintField(U[0,0:,0:], global_time, 'Ux', savepath=SAVEPATH)
+		PrintField(C, global_time, 'C', savepath=join(SAVEPATH,'C'))
+		PrintField(U[1,0:,0:], global_time, 'Uz', savepath=join(SAVEPATH,'Uz'))
+		PrintField(U[0,0:,0:], global_time, 'Ux', savepath=join(SAVEPATH,'Ux'))
 		if plot_field:
-			PlotField(C, global_time, 'C', savepath=SAVEPATH)
-			PlotField(U[1,0:,0:], global_time, 'Uz', savepath=SAVEPATH)
-			PlotField(U[0,0:,0:], global_time, 'Ux', savepath=SAVEPATH)
+			PlotField(C, global_time, 'C', savepath=join(SAVEPATH,'C'))
+			PlotField(U[1,0:,0:], global_time, 'Uz', savepath=join(SAVEPATH,'Uz'))
+			PlotField(U[0,0:,0:], global_time, 'Ux', savepath=join(SAVEPATH,'Ux'))
 
-		# Count number of maxima for each height and SAVETIME and save matrix
-
-		#NumberOfMaxima[SAVECOUNTER, :] = CountNumberOfMaxima(C)
-		#savename='NumberOfMaxima_{}x{}_yres{:d}_Ra{:d}'.\
-		#		format(HEIGHT, length, SIZE_Y, parameters['Ra'])
-		#PrintConcentrationValues(NumberOfMaxima, parameters, savepath=SAVEPATH,\
-		#	savename=savename, fmt = '%i')
 		SAVECOUNTER += 1
