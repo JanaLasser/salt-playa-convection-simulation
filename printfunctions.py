@@ -64,18 +64,19 @@ def CountNumberOfMaxima(Matrix):
 #	'HEIGHT':HEIGHT, 'LENGHT':LENGHT}
 def PrintParams(params, savepath, run_name):
 	# use `pickle.loads` to do the reverse
-	with open(join(savepath,run_name + '_params.txt')) as param_file:
-    	param_file.write('Ra {}'.format(params['Ra']))
-    	param_file.write('Ra2 {}'.format(params['Ra2']))
-    	param_file.write('amplitude {}'.format(params['amplitude']))
-    	param_file.write('waves {}'.format(params['waves']))
-    	param_file.write('phi {}'.format(params['phi']))
-    	param_file.write('max_T {}'.format(params['max_T']))
-    	param_file.write('clf {}'.format(params['clf']))
-    	param_file.write('res {}'.format(params['res']))
-    	param_file.write('HEIGHT {}'.format(params['HEIGHT']))
-    	param_file.write('LENGTH {}'.format(params['LENGHT']))
-    	param_file.write('seed {}'.format(params['seed']))
+	param_file = open(join(savepath,run_name + '_params.txt'),'a')
+	param_file.write('Ra\t{}\n'.format(params['Ra']))
+	param_file.write('Ra2\t{}\n'.format(params['Ra2']))
+	param_file.write('amplitude\t{}\n'.format(params['amplitude']))
+	param_file.write('waves\t{}\n'.format(params['waves']))
+	param_file.write('phi\t{}\n'.format(params['phi']))
+	param_file.write('max_T\t{}\n'.format(params['max_T']))
+	param_file.write('clf\t{}\n'.format(params['clf']))
+	param_file.write('res\t{}\n'.format(params['res']))
+	param_file.write('HEIGHT\t{}\n'.format(params['HEIGHT']))
+	param_file.write('LENGTH\t{}\n'.format(params['LENGTH']))
+	param_file.write('seed\t{}\n'.format(params['seed']))
 
+	param_file.close()
 
 	

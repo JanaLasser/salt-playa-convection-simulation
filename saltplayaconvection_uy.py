@@ -18,7 +18,7 @@ from printfunctions import *
 from initialconditions import *
 import sys
 import argparse
-from datetime import datetime
+from time import time
 ###################
 
 # parameter-I/O
@@ -98,7 +98,7 @@ waves = args.wave_number
 parameters = {'Ra': RA, 'Ra2' : 0., 'A': A	 , \
 	'amplitude': amplitude, 'waves': waves, 'phi': 0.0, \
 	'max_T':MAXTIME, 'clf':adaptive_dt_constant, 'res':res,\
-	'HEIGHT':HEIGHT, 'LENGHT':LENGHT}
+	'HEIGHT':HEIGHT, 'LENGTH':LENGTH}
 
 # I/O handling
 dest = args.dest # location of results folder
@@ -126,14 +126,14 @@ Ra = Rayleigh_Matrix(size, length, parameters)
 # the simulation results. Results for the three fields will
 # be saved to three subfolders 'C', 'Ux' and 'Uz'
 while os.path.exists(SAVEPATH):
-	print(SAVEPATH)
 	run += 1
 	run_name = 'Ra{}_{}x{}_res{}_T{}_clf{}_amp{}_waves{}_run{}'.format(RA, HEIGHT, \
 	int(LENGTH), res, MAXTIME, adaptive_dt_constant,amplitude, waves, run)
 	SAVEPATH = join(dest, run_name)
 
 # create directories for data storage
-fields = ['C','Ux'.'Uz']
+print('\n\nwriting to {}'.format(SAVEPATH))
+fields = ['C','Ux','Uz']
 os.makedirs(SAVEPATH)
 for field in fields:
 	os.makedirs(join(SAVEPATH,field))
@@ -204,7 +204,7 @@ def RungeKutta(U, C, dx, dt):
 		C_dyy = Dirichlet_Derivative_C(C, 'dyy')
 		return C_dxx + C_dyy - (U[0]*C_dx + U[1]*C_dy) # diffusion - advection
 
-	## classical Runge–Kutta method, 4th order
+	## classical Runge-Kutta method 4th order
 	k1 = f(U,C[:,1:-1])
 	k2 = f(U,C[:,1:-1] + (dt / 2.0) * k1)
 	k3 = f(U,C[:,1:-1] + (dt / 2.0) * k2)
@@ -245,7 +245,8 @@ def IntegrationStep(U, C, Psi, Psik, Omega, par, dx, global_time, dt):
 
 
 # Define initial conditions
-seed = datetime.now()
+seed = int(time())
+print('random seed: {}'.format(seed))
 np.random.seed(seed)
 parameters.update({'seed':seed})
 (U, C, Psi, Omega, Psik) = InitialConditions(size, parameters, dx)
@@ -254,7 +255,7 @@ U0, Omega0 = SinusoidalEvaporation(size_b, length, parameters)
 
 # print a file recording simulation parameters and random seed
 # into the simulation result root directory
-PrintParams(parameters, seed, SAVEPATH, run_name)
+PrintParams(parameters, SAVEPATH, run_name)
 
 adaptive_time_counter = 0
 while global_time < MAXTIME:
@@ -271,7 +272,8 @@ while global_time < MAXTIME:
 	# all three fields C, Ux, Uz will be saved in binary format 
 	# and plotted
 	if global_time > SAVECOUNTER*SAVETIME:
-		print(round(global_time,2), dt, MAXTIME)
+		print('current time: {}, dt = {}'\
+			.format(round(global_time,2), dt))
 		#PrintColorMatrix(Matrix = C, length = length, par = parameters, vmin = -0., vmax = 1.,\
 		#	savepath = SAVEPATH, savename = ('C_' + str(float(length[0]))+'_'), time = global_time)
 		#PrintCrossSection(Row = C[:,int(size[1]/2)].real, savepath = SAVEPATH, \
