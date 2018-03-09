@@ -1,7 +1,6 @@
 import matplotlib.pyplot as plt
 import numpy as np
 from os.path import join
-import cPickle as pickle
 
 def PrintParams():
 	pass
@@ -63,7 +62,6 @@ def CountNumberOfMaxima(Matrix):
 #	'max_T':MAXTIME, 'clf':adaptive_dt_constant, 'res':res,\
 #	'HEIGHT':HEIGHT, 'LENGHT':LENGHT}
 def PrintParams(params, savepath, run_name):
-	# use `pickle.loads` to do the reverse
 	param_file = open(join(savepath,run_name + '_params.txt'),'a')
 	param_file.write('Ra\t{}\n'.format(params['Ra']))
 	param_file.write('Ra2\t{}\n'.format(params['Ra2']))
