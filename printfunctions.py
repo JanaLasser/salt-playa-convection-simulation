@@ -32,12 +32,18 @@ def PrintCrossSection(Row, vmin = 0., vmax = 0., \
 	plt.close()
 
 def PlotField(field, time, field_name, savepath):
-	savename = '{}_{:1.3f}'.format(field_name, time)
+	if time < 10:
+		time = '0' + '{:1.3f}'.format(time)
+	else:
+		time = '{:1.3}'.format(time)
+
+	savename = '{}_{}'.format(field_name, time)
+
 	fig, ax = plt.subplots()
 	im = ax.imshow(np.transpose(field), cmap=plt.get_cmap('hot'), \
 		interpolation='nearest', aspect = 'auto')
 	fig.colorbar(im)
-	plt.title('field: {} time: {:1.3f}'.format(field_name, time))
+	plt.title('field: {} time: {}'.format(field_name, time))
 	plt.xlabel('depth [natural units]')
 	plt.ylabel('width [natural units]')
 	plt.savefig(join(savepath,savename) + '.png')
@@ -45,7 +51,11 @@ def PlotField(field, time, field_name, savepath):
 
 
 def PrintField(field, time, field_name, savepath):
-	savename = '{}_{:1.3f}'.format(field_name, time)
+	if time < 10:
+		time = '0' + '{:1.3f}'.format(time)
+	else:
+		time = '{:1.3}'.format(time)
+	savename = '{}_{}'.format(field_name, time)
 	np.save(join(savepath,savename), field)
 
 def CountNumberOfMaxima(Matrix):
