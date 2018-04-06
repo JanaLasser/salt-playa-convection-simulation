@@ -273,7 +273,7 @@ while global_time < MAXTIME:
 	# and plotted
 	if global_time > SAVECOUNTER*SAVETIME:
 		print('current time: {}, dt = {}'\
-			.format(round(global_time,2), dt))
+			.format(round(global_time,4), dt))
 		#PrintColorMatrix(Matrix = C, length = length, par = parameters, vmin = -0., vmax = 1.,\
 		#	savepath = SAVEPATH, savename = ('C_' + str(float(length[0]))+'_'), time = global_time)
 		#PrintCrossSection(Row = C[:,int(size[1]/2)].real, savepath = SAVEPATH, \
