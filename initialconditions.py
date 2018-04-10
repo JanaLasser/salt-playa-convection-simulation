@@ -1,5 +1,4 @@
 import numpy as np
-import random
 import scipy.ndimage.filters
 from scipy.special import erf
 
@@ -30,15 +29,22 @@ def Load_InitialC(path, size, frequency):
 
 # Add white noise to concentration matrix with amplitude "factor"
 # apply gaussian filter with sigma = [2,2]
-def AddRandomNoise(C, size, factor = 0.01):
+# make sure the seed is known and recorded. Since the way we are
+# adding noise to the system calls the random number generator
+# multiple times, we add +1 to the seed for every call. This way
+# we still get randomness in the system but keep the seed predictable
+def AddRandomNoise(C, size, seed, factor = 0.01):
 	C_temp = np.zeros(size, dtype=np.float32)
 	for x in range(size[0]):
 		for y in range(size[1]):
 			if y > 6 and y < size[1]-6:
-				C_temp[x,y] += (random.random()*2.-1.)*factor
+				np.random.seed(seed)
+				C_temp[x,y] += (np.random.random()*2.-1.)*factor
+				seed += 1
 	C_temp = scipy.ndimage.filters.gaussian_filter(C_temp, [2,2], mode = 'wrap')
 	#C_temp[:,0:2] = 0. # Boundary itself is not noisy
 	#C_temp[:,-3:-1] = 0.
+	print(C_temp)
 	return C+C_temp
 
 # Load steady state
