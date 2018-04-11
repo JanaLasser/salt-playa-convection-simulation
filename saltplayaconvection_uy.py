@@ -33,6 +33,9 @@ parser.add_argument('-dest', type=str, help='Complete path to the folder '\
 parser.add_argument('-Ra','--rayleigh', type=int, help='Rayleigh number of'+\
 				' the system', default=100)
 
+parser.add_argument('-Ra2','--rayleigh2', type=int, help='Second Rayleigh number of'+\
+				' the system', default=100)
+
 parser.add_argument('-H','--height', type=int, help='Height of the '\
                 + 'system in natural units',\
                 default=10)
@@ -77,6 +80,7 @@ args = parser.parse_args()
 
 # System control parameter
 RA = args.rayleigh # Rayleigh number
+RA2 = args.rayleigh2 # second Rayleigh number in case we want a split system
 
 # seed for random number generator. Will be randomly generated based
 # on system time per default. Use custom seed to re-run simulations
@@ -87,7 +91,7 @@ if seed == -1:
 
 # Space constants
 HEIGHT = args.height # height in natural units
-A = args.aspect_ratio # aspect ratio of length to HEIGHT
+A = args.aspect_ratio # aspect ratio of length to HEIGHT = L/H
 res = args.resolution # number of grid cells / unit of length
 LENGTH = HEIGHT*A
 
@@ -99,14 +103,13 @@ SAVECOUNTER = 0
 dt = 0.0001 # initial value for dt, will be adapted later
 global_time = 0.0 # initial value for global time
 
-#system parameters: Rayleigh = Ra, lower layer Rayleigh  = Ra + Ra2
-# A = aspect ratio = L/H
+# Upper boundary parameters: 
 # amplitude = amplitude of sinusoidal evaporation rate E(X)
 # waves = number of waves of E(X) in the box
 # phi = initial phase shift of these waves and the convection cell
 amplitude = args.wave_amplitude
 waves = args.wave_number
-parameters = {'Ra': RA, 'Ra2' : 0., 'A': A	 , \
+parameters = {'Ra': RA, 'Ra2':RA2, 'A': A	 , \
 	'amplitude': amplitude, 'waves': waves, 'phi': 0.0, \
 	'max_T':MAXTIME, 'clf':adaptive_dt_constant, 'res':res,\
 	'HEIGHT':HEIGHT, 'LENGTH':LENGTH}
@@ -127,7 +130,7 @@ SIZE_Y =  HEIGHT *  res
 size = np.array([int(SIZE_Y*parameters['A']), SIZE_Y]) #2d
 size_b = np.array([size[0], size[1]-2]) #size without top/bottom boundaries
 
-#grid spacing
+# grid spacing
 dx = np.divide(length, np.array([size[0], size[1]-1])) #2d
 
 # Create Rayleigh matrix for height dependent Rayleigh number
