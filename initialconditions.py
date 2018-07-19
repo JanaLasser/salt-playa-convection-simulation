@@ -1,5 +1,4 @@
 import numpy as np
-import random
 import scipy.ndimage.filters
 from scipy.special import erf
 
@@ -30,15 +29,22 @@ def Load_InitialC(path, size, frequency):
 
 # Add white noise to concentration matrix with amplitude "factor"
 # apply gaussian filter with sigma = [2,2]
-def AddRandomNoise(C, size, factor = 0.01):
+# make sure the seed is known and recorded. Since the way we are
+# adding noise to the system calls the random number generator
+# multiple times, we add +1 to the seed for every call. This way
+# we still get randomness in the system but keep the seed predictable
+def AddRandomNoise(C, size, seed, factor = 0.01):
 	C_temp = np.zeros(size, dtype=np.float32)
 	for x in range(size[0]):
 		for y in range(size[1]):
 			if y > 6 and y < size[1]-6:
-				C_temp[x,y] += (random.random()*2.-1.)*factor
+				np.random.seed(seed)
+				C_temp[x,y] += (np.random.random()*2.-1.)*factor
+				seed += 1
 	C_temp = scipy.ndimage.filters.gaussian_filter(C_temp, [2,2], mode = 'wrap')
 	#C_temp[:,0:2] = 0. # Boundary itself is not noisy
 	#C_temp[:,-3:-1] = 0.
+	print(C_temp)
 	return C+C_temp
 
 # Load steady state
@@ -50,22 +56,34 @@ def Load_SteadyStateC(size, dx, length):
 
 
 # Define matrices to have sinusoidal evaporation rate at the top boundary
-def SinusoidalEvaporation(size_b, length, parameters):
-	Omega0 = np.zeros(size_b, dtype=np.float32)
-	Ux0 = np.zeros(size_b, dtype=np.float32)
-	Uy0 = np.zeros(size_b, dtype=np.float32)
-	for x in range(size_b[0]):
-		for y in range(1,size_b[1]+1):
-			Omega0[x,y-1] = 2*parameters['waves']/length[0]*(np.cos(y*np.pi/(size_b[1]+1))+1)
-			Omega0[x,y-1] += np.cos(y*np.pi/(size_b[1]+1))*length[0]/(2*parameters['waves']*length[1]**2)
-			Omega0[x,y-1] *= -parameters['amplitude']*np.sin(2*np.pi*parameters['waves']*x/size_b[0]\
-			 + parameters['phi'])*0.5*np.pi
-			Uy0[x,y-1] = -1 - parameters['amplitude']/2.*np.cos(2*np.pi*parameters['waves']*x/size_b[0]+ \
-				parameters['phi'])*(np.cos(y*np.pi/(size_b[1]+1))+1)
-			Ux0[x,y-1] = - parameters['amplitude']*length[0]/(4*parameters['waves']*length[1])\
-			*np.sin(2*np.pi*parameters['waves']*x/size_b[0]+parameters['phi'])*np.sin(y*np.pi/(size_b[1]+1))
-	U0 = np.array([Ux0, Uy0])
-	return (U0, Omega0)
+def InitialSinusoidalEvaporation(size_b, length, parameters):
+    waves = parameters['waves']
+    amp = parameters['amplitude']
+    phi = parameters['phi']
+    W = length[0]
+    H = length[1]
+    NW = size_b[0]
+    NH = size_b[1]
+    
+    Omega0 = np.zeros(size_b, dtype=np.float32)
+    Ux0 = np.zeros(size_b, dtype=np.float32)
+    Uy0 = np.zeros(size_b, dtype=np.float32)
+    
+    for x in range(size_b[0]):
+        for y in range(1,size_b[1]+1):
+            # streamfunction
+            Omega0[x,y-1] = 2*waves/W*(cos(y*pi/(NH+1))+1)
+            Omega0[x,y-1] += cos(y*pi/(NH+1))*W/(2*waves*H**2)
+            Omega0[x,y-1] *= -amp * sin(2*pi*waves*x / NW + phi)*0.5*pi
+            
+            # vertical velocity field
+            Uy0[x,y-1] = -1 - amp/2.*cos(2*pi*waves*x/NW+phi)*(cos(y*pi/(NH+1))+1)
+            
+            # horizontal velocity field
+            Ux0[x,y-1] = - amp*W/(4*waves*H)*sin(2*pi*waves*x/NW+phi)*sin(y*pi/(NH+1))
+            
+    U0 = np.array([Ux0, Uy0])
+    return (U0, Omega0)
 
 # get grid point y from height h (in natural units)
 def yy(h, size, length):

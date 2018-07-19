@@ -33,9 +33,9 @@ def PrintCrossSection(Row, vmin = 0., vmax = 0., \
 
 def PlotField(field, time, field_name, savepath):
 	if time < 10:
-		time = '0' + '{:1.3f}'.format(time)
+		time = '0' + '{:1.4f}'.format(time)
 	else:
-		time = '{:1.3}'.format(time)
+		time = '{:1.4f}'.format(time)
 
 	savename = '{}_{}'.format(field_name, time)
 
