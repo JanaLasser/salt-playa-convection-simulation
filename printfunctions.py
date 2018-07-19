@@ -52,9 +52,9 @@ def PlotField(field, time, field_name, savepath):
 
 def PrintField(field, time, field_name, savepath):
 	if time < 10:
-		time = '0' + '{:1.3f}'.format(time)
+		time = '0' + '{:1.4f}'.format(time)
 	else:
-		time = '{:1.3}'.format(time)
+		time = '{:1.4f}'.format(time)
 	savename = '{}_{}'.format(field_name, time)
 	np.save(join(savepath,savename), field)
 
