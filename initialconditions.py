@@ -1,4 +1,5 @@
 import numpy as np
+from numpy import cos, sin, pi
 import scipy.ndimage.filters
 from scipy.special import erf
 
@@ -56,7 +57,7 @@ def Load_SteadyStateC(size, dx, length):
 
 
 # Define matrices to have sinusoidal evaporation rate at the top boundary
-def InitialSinusoidalEvaporation(size_b, length, parameters):
+def SinusoidalEvaporation(size_b, length, parameters):
     waves = parameters['waves']
     amp = parameters['amplitude']
     phi = parameters['phi']
