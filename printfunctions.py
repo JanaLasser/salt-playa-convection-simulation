@@ -67,10 +67,6 @@ def CountNumberOfMaxima(Matrix):
 				number_of_maxima[y] += 1
 	return number_of_maxima
 
-# parameters dict example: {'Ra': RA, 'Ra2' : 0., 'A': A, \
-#	'amplitude': amplitude, 'waves': waves, 'phi': 0.0, \
-#	'max_T':MAXTIME, 'clf':adaptive_dt_constant, 'res':res,\
-#	'HEIGHT':HEIGHT, 'LENGHT':LENGHT}
 def PrintParams(params, savepath, run_name):
 	param_file = open(join(savepath,run_name + '_params.txt'),'a')
 	param_file.write('Ra\t{}\n'.format(params['Ra']))
@@ -83,6 +79,7 @@ def PrintParams(params, savepath, run_name):
 	param_file.write('res\t{}\n'.format(params['res']))
 	param_file.write('HEIGHT\t{}\n'.format(params['HEIGHT']))
 	param_file.write('LENGTH\t{}\n'.format(params['LENGTH']))
+	param_file.write('Initial conditions\t{}\n'.format(params['initial conditiions']))
 	param_file.write('seed\t{}\n'.format(params['seed']))
 
 	param_file.close()
