@@ -55,6 +55,19 @@ def Load_SteadyStateC(size, dx, length):
 		C[:,y] += np.exp(-y*dx[1])/(1-np.exp(-length[1])) + 1/(1-np.exp(+length[1]))
 	return C
 
+# Load initial distribution with a linear salinity decay from 1 at the surface to 0 at the bottom
+def Load_LinearDecayC(size, dx, length):
+	C = np.zeros(size, dtype=np.float32)
+	H = length[1]
+	dx = dx[1]
+
+	decay = np.arange(0,H+dx,dx)
+	decay = 1 - decay/(H/2)
+	decay = np.where(decay < 0, 0, decay)
+
+	for y in range(H):
+		C[:,y] += decay
+	return C
 
 # Define matrices to have sinusoidal evaporation rate at the top boundary
 def SinusoidalEvaporation(size_b, length, parameters):
