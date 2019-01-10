@@ -71,6 +71,11 @@ parser.add_argument('-waves','--wave_number',type=int,\
                 help='Number of sinusoidal variations in evaporation' + \
                 ' rate at the surface boundary condition',default=1)
 
+parser.add_argument('-init','--initial_condition',type=str,\
+                help='Type of initial conditions. Can be eather "std" for' + \
+                ' the steady state condition or "lin" for a linear decay' + \
+                ' from 1 at Z=0 to 0 at Z=H/2',default='std')
+
 parser.add_argument('-S','--seed',type=int,\
                 help='Seed for the random number generator. Per default, '+\
                 'a random seed will be generated based on system time',default=-1)
@@ -109,6 +114,9 @@ global_time = 0.0 # initial value for global time
 # phi = initial phase shift of these waves and the convection cell
 amplitude = args.wave_amplitude
 waves = args.wave_number
+
+initial_condition = args.initial_condition
+
 parameters = {'Ra': RA, 'Ra2':RA2, 'A': A	 , \
 	'amplitude': amplitude, 'waves': waves, 'phi': 0.0, \
 	'max_T':MAXTIME, 'clf':adaptive_dt_constant, 'res':res,\
@@ -193,8 +201,13 @@ def Dirichlet_Derivative_C(F, direction):
 
 #### Define the initial conditions
 def InitialConditions(size, par, dx):
-	# load Steady-State
-	C = Load_SteadyStateC(size, dx, length)
+	if initial_condition = 'std':
+		# load Steady-State
+		C = Load_SteadyStateC(size, dx, length)
+	elif initial_condition = 'lin':
+		C = Load_LinearDecayC(size, dx, length)
+	else:
+		print('unknown initial conditions!')
 
 	# load from file
 	#C = Load_InitialC('onecell200.npy', size= size, frequency = parameters['waves'])
