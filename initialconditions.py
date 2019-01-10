@@ -72,7 +72,7 @@ def SinusoidalEvaporation(size_b, length, parameters):
     
     for x in range(size_b[0]):
         for y in range(1,size_b[1]+1):
-            # streamfunction
+            # vorticity
             Omega0[x,y-1] = 2*waves/W*(cos(y*pi/(NH+1))+1)
             Omega0[x,y-1] += cos(y*pi/(NH+1))*W/(2*waves*H**2)
             Omega0[x,y-1] *= -amp * sin(2*pi*waves*x / NW + phi)*0.5*pi

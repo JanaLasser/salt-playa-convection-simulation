@@ -7,12 +7,12 @@ ls
 
 - To sync data from cluster that is written onto scratch: from jlasser@oran:~$
 
-rsync -avze ssh jlasser@login:/scratch/data/jlasser/results/ /media/jlasser/Simulation_Data/results/2018-02-23
+rsync -avze ssh jlasser@login:/scratch/data/jlasser/results/ /media/jlasser/Simulation_Data/uniform-boundary
 
 
 - To submit jobs to cluster with data saved in scratch
 
-qsub -b y -l h_vmem=8G -o output_cells_jana -e error_cells_jana1 -q *.q /usr/dcf/python-3.6.1/bin/python /home/jlasser/scripts/saltplayaconvection_uy.py -dest ../../scratch/data/jlasser/results -plt -H 80 -A 0.5 -res 8 -clf 0.05 -Ra 100 -amplitude 0.05 -waves 2
+qsub -b y -l h_vmem=8G -o output_cells_jana -e error_cells_Ra100 -q *.q /usr/dcf/python-3.6.1/bin/python /home/jlasser/scripts/saltplayaconvection_uy.py -dest ../../scratch/data/jlasser/results -plt -H 80 -A 0.5 -res 8 -clf 0.05 -Ra 100 -amplitude 0.05 -waves 2
 
 
 - To sync the simulation code from home to cluster
@@ -24,5 +24,5 @@ rsync -avze ssh saltplayaconvection_uy.py jlasser@login:/home/jlasser/scripts
 qstat -g c
 
 
-
+qsub -b y -l h_vmem=8G -o output_cells_janaRa500_10 -e error_cells_Ra500_10 -q *.q /usr/dcf/python-3.6.1/bin/python /home/jlasser/scripts/saltplayaconvection_uy.py -dest ../../scratch/data/jlasser/uniform_boundary -H 80 -A 0.5 -res 24 -clf 0.05 -Ra 500 -T 5 -savetime 0.002
 
