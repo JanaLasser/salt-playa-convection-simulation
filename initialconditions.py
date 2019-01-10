@@ -60,14 +60,18 @@ def Load_LinearDecayC(size, dx, length):
 	C = np.zeros(size, dtype=np.float32)
 	H = length[1]
 	dx = dx[1]
+	num_gridpoints = size[1]
 
-	decay = np.arange(0,H+dx,dx)
-	decay = 1 - decay/(H/2)
+	decay = np.arange(0,H,dx)
+	decay = 1. - decay / (H / 2.)
 	decay = np.where(decay < 0, 0, decay)
 
-	for y in range(H):
+	for y in range(num_gridpoints):
 		C[:,y] += decay
+
+	C = np.rot90(C)
 	return C
+
 
 # Define matrices to have sinusoidal evaporation rate at the top boundary
 def SinusoidalEvaporation(size_b, length, parameters):
