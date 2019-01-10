@@ -120,7 +120,7 @@ initial_condition = args.initial_condition
 parameters = {'Ra': RA, 'Ra2':RA2, 'A': A	 , \
 	'amplitude': amplitude, 'waves': waves, 'phi': 0.0, \
 	'max_T':MAXTIME, 'clf':adaptive_dt_constant, 'res':res,\
-	'HEIGHT':HEIGHT, 'LENGTH':LENGTH, 'initial conditiions':initial_conditions}
+	'HEIGHT':HEIGHT, 'LENGTH':LENGTH, 'initial conditiions':initial_condition}
 
 # I/O handling
 dest = args.dest # location of results folder
