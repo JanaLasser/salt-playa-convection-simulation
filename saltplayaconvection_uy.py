@@ -208,6 +208,7 @@ def InitialConditions(size, par, dx):
 		C = Load_LinearDecayC(size, dx, length)
 	else:
 		print('unknown initial conditions!')
+		sys.exit()
 
 	# load from file
 	#C = Load_InitialC('onecell200.npy', size= size, frequency = parameters['waves'])
