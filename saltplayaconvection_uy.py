@@ -120,7 +120,7 @@ initial_condition = args.initial_condition
 parameters = {'Ra': RA, 'Ra2':RA2, 'A': A	 , \
 	'amplitude': amplitude, 'waves': waves, 'phi': 0.0, \
 	'max_T':MAXTIME, 'clf':adaptive_dt_constant, 'res':res,\
-	'HEIGHT':HEIGHT, 'LENGTH':LENGTH}
+	'HEIGHT':HEIGHT, 'LENGTH':LENGTH, 'initial conditiions':initial_conditions}
 
 # I/O handling
 dest = args.dest # location of results folder
@@ -201,10 +201,10 @@ def Dirichlet_Derivative_C(F, direction):
 
 #### Define the initial conditions
 def InitialConditions(size, par, dx):
-	if initial_condition = 'std':
+	if initial_condition == 'std':
 		# load Steady-State
 		C = Load_SteadyStateC(size, dx, length)
-	elif initial_condition = 'lin':
+	elif initial_condition == 'lin':
 		C = Load_LinearDecayC(size, dx, length)
 	else:
 		print('unknown initial conditions!')
