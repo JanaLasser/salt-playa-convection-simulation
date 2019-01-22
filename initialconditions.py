@@ -55,37 +55,71 @@ def Load_SteadyStateC(size, dx, length):
 		C[:,y] += np.exp(-y*dx[1])/(1-np.exp(-length[1])) + 1/(1-np.exp(+length[1]))
 	return C
 
-# Load initial distribution with a linear salinity decay from 1 at the surface to 0 at the bottom
-def Load_LinearDecayC(size, dx, length):
-    C = np.zeros(size, dtype=np.float32)
-    H = length[1]
-    dx = dx[1]
-    num_gridpoints = size[1]
+# length scales from fits to the salinity decay of the convecting system
+# see plot 4.5 of thesis and script plot_4_5_length-scale_over_Ra.ipynb
+# these length scales are hardcoded. 
+decay_length_scales ={
+20:0.74926090497, #interpolated
+23:0.6758709087350034,
+25:0.62694424457, #interpolated
+28:0.5535542483107837,
+30:0.53720645221, #interpolated
+33:0.5126847580359059,
+35:0.48241579293, #interpolated
+38:0.43701234526894506,
+40:0.4328093432823327,
+60:0.38249406911536826,
+80:0.2914565557322542,
+100:0.24326839206963757,
+120:0.22345835730519928,
+140:0.20496248898707617,
+160:0.17531070436450336,
+180:0.15560449777130897,
+200:0.14343490232045025,
+220:0.12565691532110695,
+230:0.12474404119173808,
+240:0.12101668656721586,
+250:0.11347251335736594,
+260:0.11448933091076345,
+270:0.1068533983537615,
+280:0.10042433560869075,
+290:0.09852570635307657,
+300:0.09971496345394001,
+400:0.07705545682258624,
+500:0.06231201291500437,
+600:0.04878597931141859,
+700:0.04172401582818638,
+800:0.03773896603660117,
+900:0.03331292105753958,
+1000:0.029152661038141778,
+1100:0.02658871416754643,
+1200:0.025390683253352146,
+1300:0.023629313499373198,
+1400:0.0213701942804863,
+1500:0.019274195912062243,
+1600:0.018795444312516927,
+1700:0.016958691209834127,
+1800:0.015973254171916303,
+1900:0.01498781714, #interpolated
+2000:0.01400238011, #interpolated
+3000:0.01400238011, #interpolated
+4000:0.01400238011} #interpolated
 
-    decay = np.linspace(0,H,size[1])
-    decay = 1. - decay / (H / 2.)
-    decay = np.where(decay < 0, 0, decay)
+def Load_DynamicDecayC(size, dx, length, Ra):
+	print(Ra)
+	C = np.zeros(size, dtype=np.float32)
+	H = length[1]
+	L = decay_length_scales[Ra]
+	num_gridpoints = size[1]
 
-    for y in range(num_gridpoints):
-        C[:,y] += decay
-        
-    C = np.rot90(C)
-    return C
+	decay = np.linspace(0,H,size[1])
+	decay = np.exp(-decay/L)
 
-def Load_ErrorFunction(size, dx, length):
-    C = np.zeros(size, dtype=np.float32)
-    H = length[1]
-    dx = dx[1]
-    num_gridpoints = size[1]
-
-    decay = np.linspace(0,H,size[1])
-    decay = 1. - erf(decay)
-
-    for y in range(num_gridpoints):
-        C[:,y] += decay
-        
-    C = np.rot90(C)
-    return C
+	for y in range(num_gridpoints):
+	    C[:,y] += decay
+	    
+	C = np.rot90(C)
+	return C
 
 
 # Define matrices to have sinusoidal evaporation rate at the top boundary
