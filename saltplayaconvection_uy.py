@@ -73,9 +73,9 @@ parser.add_argument('-waves','--wave_number',type=int,\
 
 parser.add_argument('-init','--initial_condition',type=str,\
                 help='Type of initial conditions. Can be eather "std" for' + \
-                ' the steady state condition, and error function "erf" ' + \
-                'or "lin" for a linear decay' + \
-                ' from 1 at Z=0 to 0 at Z=H/2',default='std')
+                ' the steady state condition or "dyn" for an exponential decay' +\
+                ' with a length scale from fits to the salinity of the convecting system',\
+                default='std')
 
 parser.add_argument('-S','--seed',type=int,\
                 help='Seed for the random number generator. Per default, '+\
@@ -205,10 +205,8 @@ def InitialConditions(size, par, dx):
 	if initial_condition == 'std':
 		# load Steady-State
 		C = Load_SteadyStateC(size, dx, length)
-	elif initial_condition == 'lin':
-		C = Load_LinearDecayC(size, dx, length)
-	elif initial_condition == 'erf':
-		C = Load_ErrorFunction(size, dx, length)
+	elif initial_condition == 'dyn':
+		C = Load_DynamicDecayC(size, dx, length, parameters['Ra'])
 	else:
 		print('unknown initial conditions!')
 		sys.exit()
