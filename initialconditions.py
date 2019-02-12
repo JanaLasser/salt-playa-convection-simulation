@@ -121,6 +121,21 @@ def Load_DynamicDecayC(size, dx, length, Ra):
 	C = np.rot90(C)
 	return C
 
+def Load_SpecificDecayC(size, dx, length, decay_length_scale):
+	C = np.zeros(size, dtype=np.float32)
+	H = length[1]
+	L = decay_length_scale
+	num_gridpoints = size[1]
+
+	decay = np.linspace(0,H,size[1])
+	decay = np.exp(-decay/L)
+
+	for y in range(num_gridpoints):
+	    C[:,y] += decay
+	    
+	C = np.rot90(C)
+	return C
+
 
 # Define matrices to have sinusoidal evaporation rate at the top boundary
 def SinusoidalEvaporation(size_b, length, parameters):

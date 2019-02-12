@@ -214,8 +214,11 @@ def InitialConditions(size, par, dx):
 		C = Load_SteadyStateC(size, dx, length)
 	elif initial_condition == 'dyn':
 		C = Load_DynamicDecayC(size, dx, length, parameters['Ra'])
+	elif parameters['Ra'] == 100:
+		decay_length_scale = float(initial_condition)
+		C = Load_SpecificDecayC(size, dx, length, decay_length_scale)
 	else:
-		print('unknown initial conditions!')
+		print('initial condition unknown, terminating...')
 		sys.exit()
 
 	# load from file
