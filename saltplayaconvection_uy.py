@@ -40,9 +40,13 @@ parser.add_argument('-H','--height', type=int, help='Height of the '\
                 + 'system in natural units',\
                 default=10)
 
-parser.add_argument('-A','--aspect_ratio', type=float, \
-                help='ratio of system width to height in natural units ',\
-                default = 1.0)
+parser.add_argument('-L','--length', type=int, help='Length of the '\
+                + 'system in natural units',\
+                default=10)
+
+#parser.add_argument('-A','--aspect_ratio', type=float, \
+#                help='ratio of system width to height in natural units ',\
+#                default = 1.0)
 
 parser.add_argument('-res','--resolution',type=int,\
                     help='number of grid cells per unit of length.',\
@@ -97,9 +101,12 @@ if seed == -1:
 
 # Space constants
 HEIGHT = args.height # height in natural units
-A = args.aspect_ratio # aspect ratio of length to HEIGHT = L/H
+LENGTH = args.length # length in natural units
+#A = args.aspect_ratio # aspect ratio of length to HEIGHT = L/H
+#LENGTH = HEIGHT*A
+A = float(LENGTH/HEIGHT)
+print(A)
 res = args.resolution # number of grid cells / unit of length
-LENGTH = HEIGHT*A
 
 # Time constants
 MAXTIME = args.maximum_simulation_time # maximum simulation time in natural units
