@@ -2,9 +2,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 from os.path import join
 
-def PrintParams():
-	pass
-
 def PrintColorMatrix(Matrix, length, par, vmin = 0., vmax = 0., savepath = '' , savename = 'test', time = 0.):
 #	with PdfPages(SAVEPATH+savename +'.pdf') as pdf:
 	fig, ax = plt.subplots()
