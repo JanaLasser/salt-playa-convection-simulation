@@ -67,6 +67,9 @@ parser.add_argument('-clf', '--adaptive_time_constant', type=float,\
 parser.add_argument('-plt','--plot_field',action="store_true",\
                 help='Plots fields for debugging / movie creation',default=False)
 
+parser.add_argument('-saveall','--save_all_fields',action="store_true",\
+                help='Saves velocity fields in addition to salinity',default=False)
+
 parser.add_argument('-amplitude','--wave_amplitude',type=float, \
                 help='Amplitude of sinusoidal variations in evaporation' + \
                 ' rate at the surface boundary condition',default=0)
@@ -137,6 +140,7 @@ run_name = 'Ra{}_{}x{}_res{}_T{}_clf{}_amp{}_waves{}_run{}'.format(RA, HEIGHT, \
 	int(LENGTH), res, MAXTIME, adaptive_dt_constant,amplitude, waves, run)
 SAVEPATH = join(dest, run_name)
 plot_field = args.plot_field
+save_all_fields = args.save_all_fields
 
 # size of box (natural units) 
 length = np.array([HEIGHT*parameters['A'],HEIGHT]) #2d
@@ -312,8 +316,9 @@ while global_time < MAXTIME:
 		print('current time: {}, dt = {}'\
 			.format(round(global_time,4), dt))
 		PrintField(C, global_time, 'C', savepath=join(SAVEPATH,'C'))
-		PrintField(U[1,0:,0:], global_time, 'Uz', savepath=join(SAVEPATH,'Uz'))
-		PrintField(U[0,0:,0:], global_time, 'Ux', savepath=join(SAVEPATH,'Ux'))
+		if save_all_fields:
+			PrintField(U[1,0:,0:], global_time, 'Uz', savepath=join(SAVEPATH,'Uz'))
+			PrintField(U[0,0:,0:], global_time, 'Ux', savepath=join(SAVEPATH,'Ux'))
 
 		# plot field for debugging reasons (publication quality plots
 		# are created separately from the field data)
