@@ -30,7 +30,7 @@ parser.add_argument('-dest', type=str, help='Complete path to the folder '\
                 + 'results will be saved to if different than script location',
                 default=getcwd())
 
-parser.add_argument('-Ra','--rayleigh', type=int, help='Rayleigh number of'+\
+parser.add_argument('-Ra','--rayleigh', type=float, help='Rayleigh number of'+\
 				' the system', default=100)
 
 parser.add_argument('-Ra2','--rayleigh2', type=int, help='Second Rayleigh number of'+\
