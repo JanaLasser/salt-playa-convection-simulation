@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 from os.path import join
+import decimal
 
 def PrintColorMatrix(Matrix, length, par, vmin = 0., vmax = 0., savepath = '' , savename = 'test', time = 0.):
 #	with PdfPages(SAVEPATH+savename +'.pdf') as pdf:
@@ -28,11 +29,11 @@ def PrintCrossSection(Row, vmin = 0., vmax = 0., \
 	plt.savefig(savepath+savename + str(round(time, 2)) + '.png')
 	plt.close()
 
-def PlotField(field, time, field_name, savepath):
-	if time < 10:
-		time = '0' + '{:1.4f}'.format(time)
-	else:
-		time = '{:1.4f}'.format(time)
+def PlotField(field, time, dt, field_name, savepath):
+	decimal_digits = np.abs(decimal.Decimal(str(dt)).as_tuple().exponent)
+	time = round(time, decimal_digits)
+	time = '{:1.5f}'.format(time)
+	time = time.zfill(10)
 
 	savename = '{}_{}'.format(field_name, time)
 
@@ -46,12 +47,12 @@ def PlotField(field, time, field_name, savepath):
 	plt.savefig(join(savepath,savename) + '.png')
 	plt.close()
 
+def PrintField(field, time, dt, field_name, savepath):
+	decimal_digits = np.abs(decimal.Decimal(str(dt)).as_tuple().exponent)
+	time = round(time, decimal_digits)
+	time = '{:1.5f}'.format(time)
+	time = time.zfill(10)
 
-def PrintField(field, time, field_name, savepath):
-	if time < 10:
-		time = '0' + '{:1.4f}'.format(time)
-	else:
-		time = '{:1.4f}'.format(time)
 	savename = '{}_{}'.format(field_name, time)
 	np.save(join(savepath,savename), field)
 

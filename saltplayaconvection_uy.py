@@ -72,7 +72,7 @@ parser.add_argument('-saveall','--save_all_fields',action="store_true",\
 
 parser.add_argument('-amplitude','--wave_amplitude',type=float, \
                 help='Amplitude of sinusoidal variations in evaporation' + \
-                ' rate at the surface boundary condition',default=0)
+                ' rate at the surface boundary condition',default=0.0)
 
 parser.add_argument('-waves','--wave_number',type=int,\
                 help='Number of sinusoidal variations in evaporation' + \
@@ -315,16 +315,16 @@ while global_time < MAXTIME:
 	if global_time > SAVECOUNTER*SAVETIME:
 		print('current time: {}, dt = {}'\
 			.format(round(global_time,4), dt))
-		PrintField(C, global_time, 'C', savepath=join(SAVEPATH,'C'))
+		PrintField(C, global_time, SAVETIME, 'C', savepath=join(SAVEPATH,'C'))
 		if save_all_fields:
-			PrintField(U[1,0:,0:], global_time, 'Uz', savepath=join(SAVEPATH,'Uz'))
-			PrintField(U[0,0:,0:], global_time, 'Ux', savepath=join(SAVEPATH,'Ux'))
+			PrintField(U[1,0:,0:], global_time, SAVETIME, 'Uz', savepath=join(SAVEPATH,'Uz'))
+			PrintField(U[0,0:,0:], global_time, SAVETIME, 'Ux', savepath=join(SAVEPATH,'Ux'))
 
 		# plot field for debugging reasons (publication quality plots
 		# are created separately from the field data)
 		if plot_field:
-			PlotField(C, global_time, 'C', savepath=join(SAVEPATH,'C'))
-			PlotField(U[1,0:,0:], global_time, 'Uz', savepath=join(SAVEPATH,'Uz'))
-			PlotField(U[0,0:,0:], global_time, 'Ux', savepath=join(SAVEPATH,'Ux'))
+			PlotField(C, global_time, SAVETIME, 'C', savepath=join(SAVEPATH,'C'))
+			PlotField(U[1,0:,0:], global_time, SAVETIME, 'Uz', savepath=join(SAVEPATH,'Uz'))
+			PlotField(U[0,0:,0:], global_time, SAVETIME, 'Ux', savepath=join(SAVEPATH,'Ux'))
 
 		SAVECOUNTER += 1
