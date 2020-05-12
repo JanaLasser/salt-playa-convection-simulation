@@ -159,10 +159,10 @@ def SinusoidalEvaporation(size_b, length, parameters):
             Omega0[x,y-1] *= -amp * sin(2*pi*waves*x / NW + phi)*0.5*pi
             
             # vertical velocity field
-            Uy0[x,y-1] = -1 - amp/2.*cos(2*pi*waves*x/NW+phi)*(cos(y*pi/(NH+1))+1)
+            Uy0[x,y-1] = -1 + amp/2.*cos(2*pi*waves*x/NW+phi)*(cos(y*pi/(NH+1))+1)
             
             # horizontal velocity field
-            Ux0[x,y-1] = - amp*W/(4*waves*H)*sin(2*pi*waves*x/NW+phi)*sin(y*pi/(NH+1))
+            Ux0[x,y-1] = + amp*W/(4*waves*H)*sin(2*pi*waves*x/NW+phi)*sin(y*pi/(NH+1))
             
     U0 = np.array([Ux0, Uy0])
     return (U0, Omega0)
