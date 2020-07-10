@@ -94,6 +94,8 @@ args = parser.parse_args()
 # System control parameter
 RA = args.rayleigh # Rayleigh number
 RA2 = args.rayleigh2 # second Rayleigh number in case we want a split system
+if RA / int(RA) == 1:
+	RA = int(RA)
 
 # seed for random number generator. Will be randomly generated based
 # on system time per default. Use custom seed to re-run simulations
