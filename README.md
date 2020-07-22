@@ -1,12 +1,15 @@
 # salt-playa-convection-simulation
-Two-dimensional simulation code for buoyancy driven convection below an evaporating salt lake. 
+Two-dimensional simulation code for buoyancy driven convection below an evaporating salt lake.  
+
+**author**: Jana Lasser  
+**copyright** Copyright 2020, Geophysical pattern formation in salt playa  
+**credits** Jana Lasser, Marcel Ernst  
+**version** 1.0.0  
 
 The simulation code was used to investigate the behaviour of convecting salty water in the sand below and evaporating salt lake that is suspected to cause the formation of polygonal salt crust patterns on the surface. The connection to salt crust papers is described in [_Salt polygons are caused by convection_, J. Lasser et al. 2020](https://arxiv.org/pdf/1902.03600). The properties of the convective dynamics is expored in more detail in [_Stability of convection in dry salt lakes_, M. Ernst, J. Lasser, L. Goehring 2020](https://arxiv.org/abs/2004.10578).
 
-**author**: Jana Lasser
-**copyright** Copyright 2020, Geophysical pattern formation in salt playa
-**credits** Jana Lasser, Marcel Ernst
-**version** 1.0.0
+
+A detailed description of the theory behind the simulation code and the implementation is given in [Marcel Ernst's master's thesis](http://hdl.handle.net/21.11116/0000-0002-16A7-9). A description of the connection of buoyancy driven porous media convection to pattern formation in salt deserts is diven in [Jana Lasser's PhD thesis](http://hdl.handle.net/11858/00-1735-0000-002E-E5DB-2).
 
 ## Usage
 The script ```main.py``` allows for input of different simulation parameters specifying the simulation domain and boundary conditions over the command line (see also main.py -h for all available options).
