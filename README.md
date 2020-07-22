@@ -32,7 +32,7 @@ The script ```main.py``` allows for input of different simulation parameters spe
 
 ### Examples
 #### Simulation with specified domain size and Rayleigh number
-To start a simulation at $Ra=500$ with a simulation domain size of $40\,$L$\times 100\,$L and a resolution of 8 gridpoints per unit length:  
+To start a simulation at Rayleigh=500 with a simulation domain size of 40 (width) X 100 (height) and a resolution of 8 gridpoints per unit length:  
 
 ```python main.py -Ra 500 -W 40 -H 100 -res 8 -plt -saveall```  
 
@@ -43,4 +43,4 @@ To start a simulation with a pre-defined seed (for example because you want to t
 
 ``` python main.py -waves 4 -amplitude 0.5 -S 12345 -dest testing/```  
 
-This will start a simulation at $Ra=100$ with a domain size of $10\,$L$\times 10\,$L and resolution of 6 grid points per unit length (default values). Only the salinity field will be saved every $0.1\,$T (default value), this time to a custom directory ```testing/``` (```-dest```). The simulation will use the random seed 12345 specified by you (```-S```).
+This will start a simulation at Rayleigh=100 with a domain size of 10 X 10 and resolution of 6 grid points per unit length (default values). Only the salinity field will be saved every 0.1 T (default value), this time to a custom directory ```testing/``` (```-dest```). The simulation will use the random seed 12345 specified by you (```-S```).
