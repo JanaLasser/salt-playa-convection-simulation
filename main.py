@@ -1,22 +1,60 @@
-## Limit number of OMP threads used by numpy/scipy via OpenBLAS
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+
+"""
+Two-dimensional simulation code for buoyancy driven convection below an 
+evaporating salt lake. Allows for input of different simulation parameters
+(see main.py -h for all available options) as well as different boundary
+conditions.
+
+This source code is subject to the terms of the MIT license. If a copy of the
+MIT license was not distributed with this file, you can obtain one at
+https://opensource.org/licenses/MIT
+
+Permission is hereby granted, free of charge, to any person obtaining a copy 
+of this software and associated documentation files (the "Software"), to 
+deal in the Software without restriction, including without limitation the 
+rights to use, copy, modify, merge, publish, distribute, sublicense, and/or 
+sell copies of the Software, and to permit persons to whom the Software is 
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in 
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE 
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN 
+THE SOFTWARE.
+"""
+
+__author__ = 'Jana Lasser'
+__copyright__ = 'Copyright 2020, Geophysical pattern formation in salt playa'
+__credits__ = ['Jana Lasser', 'Marcel Ernst']
+__license__ = 'MIT'
+__version__ = '1.0.0'
+__maintainer__ = 'Jana Lasser'
+__email__ = 'lasser@csh.ac.at'
+__status__ = 'Dev'
+
+
 import os
-os.environ['OMP_NUM_THREADS'] = '{:d}'.format(1)
 from os.path import join
 from os import getcwd
+import sys
+import argparse
+from time import time
 
 import numpy as np
-
-import matplotlib as mpl
-mpl.use('Agg')
-import matplotlib.pyplot as plt
 
 from derivative import *
 from printfunctions import *
 from initialconditions import *
-import sys
-import argparse
-from time import time
-###################
+
+# Limit number of OMP threads used by numpy/scipy via OpenBLAS
+os.environ['OMP_NUM_THREADS'] = '{:d}'.format(1)
 
 # parameter-I/O
 parser = argparse.ArgumentParser(description='Simulation of two-dimensional '\
@@ -189,19 +227,6 @@ derivatives = {'dx' : matrix_dx, 'dxx': matrix_dxx, \
 
 dirichlet_vectors = {'dy': dirichlet_vector_dy, 'dyy': dirichlet_vector_dyy}
 
-### Derivative in x- and y- direction
-def Derivative(F, direction):
-	if direction in ['dx', 'dxx']:
-		return np.matmul(derivatives[direction], F)
-	elif direction in ['dy', 'dyy']:
-		return np.transpose(np.matmul(derivatives[direction], np.transpose(F)))
-
-### Derivative in y-direction for the concentration applying boundaries_C
-def Dirichlet_Derivative_C(F, direction): 
-	b = np.zeros((size[1]-2,))
-	for i in range(2):
-		b += dirichlet_vectors[direction][i]*boundaries_C[i]
-	return np.transpose(np.matmul(derivatives[direction], np.transpose(F))) + b
 
 
 
