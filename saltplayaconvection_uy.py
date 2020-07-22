@@ -5,15 +5,12 @@ from os.path import join
 from os import getcwd
 
 import numpy as np
-#from scipy.fftpack import fftn, ifftn, dst, idst, fft, ifft
 
-#from scipy.linalg import solve_sylvester
 import matplotlib as mpl
 mpl.use('Agg')
 import matplotlib.pyplot as plt
 
-from derivative import CreateCFDMatrix#, CreateFFTMatrix
-from np_derivatives import CreateNP_CFDMatrix, Create_FFTMatrix
+from derivative import *
 from printfunctions import *
 from initialconditions import *
 import sys
@@ -43,10 +40,6 @@ parser.add_argument('-H','--height', type=int, help='Height of the '\
 parser.add_argument('-L','--length', type=int, help='Length of the '\
                 + 'system in natural units',\
                 default=10)
-
-#parser.add_argument('-A','--aspect_ratio', type=float, \
-#                help='ratio of system width to height in natural units ',\
-#                default = 1.0)
 
 parser.add_argument('-res','--resolution',type=int,\
                     help='number of grid cells per unit of length.',\
@@ -110,7 +103,6 @@ LENGTH = args.length # length in natural units
 #A = args.aspect_ratio # aspect ratio of length to HEIGHT = L/H
 #LENGTH = HEIGHT*A
 A = float(LENGTH/HEIGHT)
-print(A)
 res = args.resolution # number of grid cells / unit of length
 
 # Time constants
