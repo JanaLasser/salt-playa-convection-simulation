@@ -43,9 +43,6 @@ def AddRandomNoise(C, size, seed, factor = 0.01):
 				C_temp[x,y] += (np.random.random()*2.-1.)*factor
 				seed += 1
 	C_temp = scipy.ndimage.filters.gaussian_filter(C_temp, [2,2], mode = 'wrap')
-	#C_temp[:,0:2] = 0. # Boundary itself is not noisy
-	#C_temp[:,-3:-1] = 0.
-	print(C_temp)
 	return C+C_temp
 
 # Load steady state
@@ -55,8 +52,8 @@ def Load_SteadyStateC(size, dx, length):
 		C[:,y] += np.exp(-y*dx[1])/(1-np.exp(-length[1])) + 1/(1-np.exp(+length[1]))
 	return C
 
-# length scales from fits to the salinity decay of the convecting system
-# see plot 4.5 of thesis and script plot_4_5_length-scale_over_Ra.ipynb
+# length scales measured from fits to the salinity decay of the convecting system
+# see plot 4.5 (b) of thesis http://hdl.handle.net/11858/00-1735-0000-002E-E5DB-2
 # these length scales are hardcoded. 
 decay_length_scales ={
 20:0.74926090497, #interpolated
@@ -106,7 +103,6 @@ decay_length_scales ={
 4000:0.01400238011} #interpolated
 
 def Load_DynamicDecayC(size, dx, length, Ra):
-	print(Ra)
 	C = np.zeros(size, dtype=np.float32)
 	H = length[1]
 	L = decay_length_scales[Ra]
@@ -180,6 +176,7 @@ def Rayleigh(y, size, length, parameters):
 	mu = length[1]-2.0
 	sigma = 0.2
 	return parameters['Ra'] +  parameters['Ra2']*0.5*(1+erf((h(y, size, length)-mu)/sigma))
+
 def Rayleigh_Matrix(size, length, parameters):
 	Ra = np.zeros(size, dtype=np.float32)
 	for y in range(size[1]):
