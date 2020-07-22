@@ -127,3 +127,10 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# project specific
+archive/
+*.sh
+*.ipynb
+testing/
+cluster_code_2019-01-10/
