@@ -205,7 +205,7 @@ for field in fields:
 	os.makedirs(join(SAVEPATH,field))
 
 # values of boundaries for concentration (C from 0 to 1)
-boundaries_C = [1., 0.] #!!!!!
+boundaries_C = [1., 0.] 
 
 # 6th order coefficients
 coeff_dx    = ([1., 1./3],       [14./9., 1./9.]     , 1, 'periodic')
@@ -227,10 +227,24 @@ derivatives = {'dx' : matrix_dx, 'dxx': matrix_dxx, \
 
 dirichlet_vectors = {'dy': dirichlet_vector_dy, 'dyy': dirichlet_vector_dyy}
 
+### helper functions
+
+# derivative in x- and y- direction
+def Derivative(F, direction):
+	if direction in ['dx', 'dxx']:
+		return np.matmul(derivatives[direction], F)
+	elif direction in ['dy', 'dyy']:
+		return np.transpose(np.matmul(derivatives[direction], np.transpose(F)))
+
+# derivative in y-direction for the concentration applying boundaries_C
+def Dirichlet_Derivative_C(F, direction): 
+	b = np.zeros((size[1]-2,))
+	for i in range(2):
+		b += dirichlet_vectors[direction][i]*boundaries_C[i]
+	return np.transpose(np.matmul(derivatives[direction], np.transpose(F))) + b
 
 
-
-#### Define the initial conditions
+# define the initial conditions
 def InitialConditions(size, par, dx):
 	if initial_condition == 'std':
 		# load Steady-State
@@ -258,7 +272,7 @@ def InitialConditions(size, par, dx):
 	U = np.array([Derivative(Psi, 'dy') ,-1 - Derivative(Psi, 'dx')])
 	return (U, C, Psi, Omega, Psik)
 
-# solve Advection-Diffusion equation in real space
+# solve advection-diffusion equation in real space
 def RungeKutta(U, C, dx, dt):
 	def f(U,C):
 		C_dx = Derivative(C, 'dx')
@@ -274,20 +288,12 @@ def RungeKutta(U, C, dx, dt):
 	k4 = f(U,C[:,1:-1] + dt * k3)
 	C[:,1:-1] += dt / 6.0 * (k1 + 2* k2 + 2 * k3 + k4)
 
-	# 3rd order Runge-Kutta (Wray 1991)
-	# more stable!
-	#k1 = C[:,1:-1] + dt*8./15*f(U,C[:,1:-1])
-	#k2 = k1 + dt*(5./12*f(U,k1) - 17./60 * f(U,C[:,1:-1]))
-	#C[:,1:-1] = k2 + dt*(3./4*f(U,k2) - 5./12 * f(U,k1))
-
 	return C
 
-### primary function for the time stepping
+# primary function for the time stepping
 def IntegrationStep(U, C, Psi, Psik, Omega, par, dx, global_time, dt):
 	# Compute Omega from Ra and concentration Matrix C in real space
 	Omega = +Ra[:,1:-1] * Derivative(C[:,1:-1], 'dx') - Omega0
-
-	# Psi = solve_sylvester(derivatives['dxx'], derivatives['dyy'], -Omega)
 
 	# compute Omega in Fourier space
 	Omegak = np.fft.fftshift(np.fft.fft(-Omega, axis = 0), axes = 0)
@@ -307,6 +313,7 @@ def IntegrationStep(U, C, Psi, Psik, Omega, par, dx, global_time, dt):
 	global_time += dt
 	return (U, C, Psi, Omega, global_time)
 
+	
 
 # define initial conditions
 print('random seed: {}'.format(seed))
