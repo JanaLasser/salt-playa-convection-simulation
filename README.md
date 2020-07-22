@@ -45,3 +45,6 @@ To start a simulation with a pre-defined seed (for example because you want to t
 ``` python main.py -waves 4 -amplitude 0.5 -S 12345 -dest testing/```  
 
 This will start a simulation at Rayleigh=100 with a domain size of 10 X 10 and resolution of 6 grid points per unit length (default values). Only the salinity field will be saved every 0.1 T (default value), this time to a custom directory ```testing/``` (```-dest```). The simulation will use the random seed 12345 specified by you (```-S```).
+
+## Acknowledgements
+I would like to thank [Prof. Lucas Goehring](https://www.ntu.ac.uk/staff-profiles/science-technology/lucas-goehring) for supervising the work on this project and the [GGNB](https://www.uni-goettingen.de/en/56640.html) for funding me during parts of the time in which I worked on it.
