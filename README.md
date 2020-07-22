@@ -33,12 +33,14 @@ The script ```main.py``` allows for input of different simulation parameters spe
 ### Examples
 #### Simulation with specified domain size and Rayleigh number
 To start a simulation at $Ra=500$ with a simulation domain size of $40\,$L$\times 100\,$L and a resolution of 8 gridpoints per unit length:  
+
 ```python main.py -Ra 500 -W 40 -H 100 -res 8 -plt -saveall```  
 
 This will create a new folder in your current directory with the simulation parameters encoded in the folder name. The folder contains three subfolders for each of the three simulated fields (salinity, velocity in x-direction, velocity in z-direction) as well as a text-file with the simulation parameters. The simulation will save snapshots of all three fields (```-saveall```) in their respective folders at time intervals of ```dt=0.1``` (default value) and also save plots of the fields alongside the matrices (```-plt```). The simulation will run for 25 natural time units (default value) use the steady state solution of the governing equations as initial condition and use a CLF constant of 0.05 (default values).
 
 #### Simulation with top boundary modulation
 To start a simulation with a pre-defined seed (for example because you want to test different parameters at the exact same initial conditions) and a top boundary condition that is modulated by 4 sinusoidal waves with an amplitude of 0.5:  
+
 ``` python main.py -waves 4 -amplitude 0.5 -S 12345 -dest testing/```  
 
 This will start a simulation at $Ra=100$ with a domain size of $10\,$L$\times 10\,$L and resolution of 6 grid points per unit length (default values). Only the salinity field will be saved every $0.1\,$T (default value), this time to a custom directory ```testing/``` (```-dest```). The simulation will use the random seed 12345 specified by you (```-S```).
